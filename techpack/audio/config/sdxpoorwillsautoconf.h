@@ -1,14 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (c) 2017-2018, The Linux Foundation. All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 and
- * only version 2 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
  */
 
 #define CONFIG_PINCTRL_WCD 1
@@ -23,9 +15,6 @@
 #define CONFIG_SND_SOC_WCD934X_DSD 1
 #define CONFIG_MSM_QDSP6V2_CODECS 1
 #define CONFIG_MSM_QDSP6_APRV3_GLINK 1
-#define CONFIG_MSM_QDSP6_NOTIFIER 1
-#define CONFIG_MSM_QDSP6_SSR 1
-#define CONFIG_MSM_QDSP6_PDR 1
 #define CONFIG_SND_SOC_MSM_QDSP6V2_INTF 1
 #define CONFIG_MSM_ADSP_LOADER 1
 #define CONFIG_REGMAP_SWR 1

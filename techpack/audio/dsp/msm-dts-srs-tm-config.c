@@ -1,14 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0-only
 /*
- * Copyright (c) 2012-2014, 2016-2017, The Linux Foundation. All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 and
- * only version 2 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Copyright (c) 2012-2014, 2016-2018, 2020, The Linux Foundation. All rights reserved.
  */
 
 #include <linux/err.h>
@@ -16,7 +8,6 @@
 #include <linux/bitops.h>
 #include <linux/mutex.h>
 #include <linux/atomic.h>
-#include <sound/asound.h>
 #include <sound/control.h>
 #include <dsp/msm_audio_ion.h>
 #include <dsp/q6adm-v2.h>
@@ -25,8 +16,7 @@
 static int srs_port_id[AFE_MAX_PORTS] = {-1};
 static int srs_copp_idx[AFE_MAX_PORTS] = {-1};
 static union srs_trumedia_params_u msm_srs_trumedia_params;
-static struct ion_client *ion_client;
-static struct ion_handle *ion_handle;
+struct dma_buf *dma_buf;
 static struct param_outband po;
 static atomic_t ref_cnt;
 #define ION_MEM_SIZE	(8 * 1024)
@@ -273,23 +263,23 @@ static const struct snd_kcontrol_new lpa_srs_trumedia_controls_mi2s[] = {
  * msm_dts_srs_tm_add_controls -
  *        Add DTS SRS module controls
  *
- * @platform: component to which controls can be registered
+ * @component: component to which controls can be registered
  *
  */
-void msm_dts_srs_tm_add_controls(struct snd_soc_platform *platform)
+void msm_dts_srs_tm_add_controls(struct snd_soc_component *component)
 {
-	snd_soc_add_platform_controls(platform,
+	snd_soc_add_component_controls(component,
 				lpa_srs_trumedia_controls,
 			ARRAY_SIZE(lpa_srs_trumedia_controls));
 
-	snd_soc_add_platform_controls(platform,
+	snd_soc_add_component_controls(component,
 				lpa_srs_trumedia_controls_hdmi,
 			ARRAY_SIZE(lpa_srs_trumedia_controls_hdmi));
 
-	snd_soc_add_platform_controls(platform,
+	snd_soc_add_component_controls(component,
 				lpa_srs_trumedia_controls_i2s,
 			ARRAY_SIZE(lpa_srs_trumedia_controls_i2s));
-	snd_soc_add_platform_controls(platform,
+	snd_soc_add_component_controls(component,
 				lpa_srs_trumedia_controls_mi2s,
 			ARRAY_SIZE(lpa_srs_trumedia_controls_mi2s));
 }
@@ -299,13 +289,13 @@ static int reg_ion_mem(void)
 {
 	int rc;
 
-	rc = msm_audio_ion_alloc("SRS_TRUMEDIA", &ion_client, &ion_handle,
-				 ION_MEM_SIZE, &po.paddr, (size_t *)&po.size,
+	rc = msm_audio_ion_alloc(&dma_buf, ION_MEM_SIZE,
+				 &po.paddr, (size_t *)&po.size,
 				 &po.kvaddr);
 	if (rc != 0)
 		pr_err("%s: failed to allocate memory.\n", __func__);
-		pr_debug("%s: exited ion_client = %pK, ion_handle = %pK, phys_addr = %lu, length = %d, vaddr = %pK, rc = 0x%x\n",
-			__func__, ion_client, ion_handle, (long)po.paddr,
+		pr_debug("%s: exited dma_buf = %pK, phys_addr = %lu, length = %d, vaddr = %pK, rc = 0x%x\n",
+			__func__, dma_buf, (long)po.paddr,
 			(unsigned int)po.size, po.kvaddr, rc);
 	return rc;
 }
@@ -323,7 +313,8 @@ void msm_dts_srs_tm_ion_memmap(struct param_outband *po_)
 
 static void unreg_ion_mem(void)
 {
-	msm_audio_ion_free(ion_client, ion_handle);
+	msm_audio_ion_free(dma_buf);
+	dma_buf = NULL;
 	po.kvaddr = NULL;
 	po.paddr = 0;
 	po.size = 0;

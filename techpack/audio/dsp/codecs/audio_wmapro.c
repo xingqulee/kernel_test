@@ -1,8 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0-only
 /* wmapro audio output device
  *
  * Copyright (C) 2008 Google, Inc.
  * Copyright (C) 2008 HTC Corporation
- * Copyright (c) 2009-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2009-2021, The Linux Foundation. All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -16,7 +17,7 @@
  */
 
 #include <linux/types.h>
-#include <linux/msm_audio_wmapro.h>
+#include <audio/linux/msm_audio_wmapro.h>
 #include <linux/compat.h>
 #include "audio_utils_aio.h"
 
@@ -336,7 +337,7 @@ static int audio_open(struct inode *inode, struct file *file)
 
 	rc = audio_aio_open(audio, file);
 	if (rc < 0) {
-		pr_err("%s: audio_aio_open rc=%d\n",
+		pr_err_ratelimited("%s: audio_aio_open rc=%d\n",
 			__func__, rc);
 		goto fail;
 	}

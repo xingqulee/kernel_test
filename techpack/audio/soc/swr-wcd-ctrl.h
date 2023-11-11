@@ -1,13 +1,6 @@
-/* Copyright (c) 2015-2018, The Linux Foundation. All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 and
- * only version 2 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+/* SPDX-License-Identifier: GPL-2.0-only */
+/*
+ * Copyright (c) 2015-2018, The Linux Foundation. All rights reserved.
  */
 
 #ifndef _SWR_WCD_CTRL_H
@@ -34,6 +27,7 @@ enum {
 	SWR_MSTR_RESUME,
 	SWR_MSTR_UP,
 	SWR_MSTR_DOWN,
+	SWR_MSTR_SSR,
 };
 
 enum {
@@ -105,6 +99,11 @@ struct swr_mstr_ctrl {
 	struct platform_device *pdev;
 	int num_rx_chs;
 	u8 num_cfg_devs;
+	struct mutex force_down_lock;
+	int force_down_state;
+
+	struct notifier_block event_notifier;
+	struct work_struct dc_presence_work;
 };
 
 #endif /* _SWR_WCD_CTRL_H */
